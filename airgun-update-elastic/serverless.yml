@@ -1,0 +1,141 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: airgun-update-elastic
+
+# You can pin your service to only deploy with a specific Serverless version
+# Check out our docs for more details
+# frameworkVersion: "=X.X.X"
+
+provider:
+  name: aws
+  runtime: python2.7
+  region: ap-southeast-2
+  environment:
+    ELASTICSEARCH_URL: ${file(serverless.env.yml):${opt:stage}.ELASTICSEARCH_URL}
+  iamRoleStatements:
+    - Effect: "Allow"
+      Resource: "*"
+      Action:
+        - "kinesis:*"
+        - "cloudwatch:DeleteAlarms"
+        - "cloudwatch:DescribeAlarmHistory"
+        - "cloudwatch:DescribeAlarms"
+        - "cloudwatch:DescribeAlarmsForMetric"
+        - "cloudwatch:GetMetricStatistics"
+        - "cloudwatch:ListMetrics"
+        - "cloudwatch:PutMetricAlarm"
+        - "datapipeline:ActivatePipeline"
+        - "datapipeline:CreatePipeline"
+        - "datapipeline:DeletePipeline"
+        - "datapipeline:DescribeObjects"
+        - "datapipeline:DescribePipelines"
+        - "datapipeline:GetPipelineDefinition"
+        - "datapipeline:ListPipelines"
+        - "datapipeline:PutPipelineDefinition"
+        - "datapipeline:QueryObjects"
+        - "iam:ListRoles"
+        - "sns:CreateTopic"
+        - "sns:DeleteTopic"
+        - "sns:ListSubscriptions"
+        - "sns:ListSubscriptionsByTopic"
+        - "sns:ListTopics"
+        - "sns:Subscribe"
+        - "sns:Unsubscribe"
+        - "sns:SetTopicAttributes"
+        - "lambda:CreateFunction"
+        - "lambda:ListFunctions"
+        - "lambda:ListEventSourceMappings"
+        - "lambda:CreateEventSourceMapping"
+        - "lambda:DeleteEventSourceMapping"
+        - "lambda:GetFunctionConfiguration"
+        - "lambda:DeleteFunction"
+        - "logs:CreateLogGroup"
+        - "logs:CreateLogStream"
+        - "logs:PutLogEvents"
+        - "ec2:CreateNetworkInterface"
+        - "ec2:DescribeNetworkInterfaces"
+        - "ec2:DeleteNetworkInterface"
+
+# you can overwrite defaults here
+#  stage: dev
+#  region: us-east-1
+
+# you can add statements to the Lambda function's IAM Role here
+#  iamRoleStatements:
+#    - Effect: "Allow"
+#      Action:
+#        - "s3:ListBucket"
+#      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
+#    - Effect: "Allow"
+#      Action:
+#        - "s3:PutObject"
+#      Resource:
+#        Fn::Join:
+#          - ""
+#          - - "arn:aws:s3:::"
+#            - "Ref" : "ServerlessDeploymentBucket"
+
+# you can define service wide environment variables here
+#  environment:
+#    variable1: value1
+
+# you can add packaging information here
+#package:
+#  include:
+#    - include-me.py
+#    - include-me-dir/**
+#  exclude:
+#    - exclude-me.py
+#    - exclude-me-dir/**
+
+functions:
+  event_queue_processing:
+    handler: update_object_processing_queue.lambda_handler
+    description: "lambda to update a user in elasticsearch"
+    timeout: 60
+    events:
+      - stream:
+          arn: ${file(serverless.env.yml):${opt:stage}.KINESIS_ARN}
+          batchSize: 100
+          startingPosition: LATEST
+          enabled: true
+
+#    The following are a few example events you can configure
+#    NOTE: Please make sure to change your handler code to work with those events
+#    Check the event documentation for details
+#    events:
+#      - http:
+#          path: users/create
+#          method: get
+#      - s3: ${env:BUCKET}
+#      - schedule: rate(10 minutes)
+#      - sns: greeter-topic
+#      - stream: arn:aws:dynamodb:region:XXXXXX:table/foo/stream/1970-01-01T00:00:00.000
+#      - alexaSkill
+
+#    Define function environment variables here
+#    environment:
+#      variable2: value2
+
+# you can add CloudFormation resource templates here
+#resources:
+#  Resources:
+#    NewResource:
+#      Type: AWS::S3::Bucket
+#      Properties:
+#        BucketName: my-new-bucket
+#  Outputs:
+#     NewOutput:
+#       Description: "Description for the output"
+#       Value: "Some output value"

@@ -1,0 +1,6 @@
+machine:
+  machine:
+    python:
+      version: pypy-2.7.13
+  test:
+    - python -m unittest discover -s spec -p "*_spec.py"
