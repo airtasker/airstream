@@ -1,4 +1,4 @@
-![AirStream Logo](assets/airstream.png)
+![AirStream Logo](assets/airstream-logo.png)
 
 ## AirStream
 
