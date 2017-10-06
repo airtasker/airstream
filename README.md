@@ -1,4 +1,4 @@
-<img src="assets/airstream-logo.png" alt="AirStream Logo" align="left" height="200" width="400" > 
+<img src="assets/airstream-logo.png" alt="AirStream Logo" align="center" height="200" width="400" > 
 
 ## AirStream
 
